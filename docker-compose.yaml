@@ -1,0 +1,36 @@
+version: '2'
+services:
+  app:
+    stdin_open: true
+    build:
+      context: ./core
+      dockerfile: ./src/main/docker/Dockerfile
+    container_name: heroes-management-api
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/heroesmanagement
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_GENERATE_DDL=false
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+    ports:
+      - "8080:8080"
+    restart: always
+  db:
+    image: 'postgres:13.1-alpine'
+    build:
+      context: ./core/src/main/resources
+      dockerfile: ./db/schema/Dockerfile
+    container_name: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=heroesmanagement
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  pgdata:

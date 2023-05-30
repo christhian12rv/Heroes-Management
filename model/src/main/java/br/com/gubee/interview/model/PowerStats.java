@@ -1,5 +1,7 @@
 package br.com.gubee.interview.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
@@ -9,7 +11,7 @@ import java.util.UUID;
 @Table(name = "power_stats")
 public class PowerStats {
     @Id
-    @Column(name = "id", unique = true, nullable = false, updatable = false)
+    @Column(name = "id", unique = true, nullable = false, updatable = false, columnDefinition = "id PRIMARY KEY NOT NULL DEFAULT public.uuid_generate_v4()")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
@@ -33,6 +35,7 @@ public class PowerStats {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
+    @JsonBackReference
     @OneToOne(mappedBy = "powerStats")
     private Hero hero;
 
@@ -106,7 +109,31 @@ public class PowerStats {
         return hero;
     }
 
-    public void setHeroes(Hero hero) {
+    public void setHero(Hero hero) {
         this.hero = hero;
+    }
+
+    public void copyNonNullAttributes(PowerStats powerStats) {
+        if (powerStats.getId() != null)
+            this.setId(powerStats.getId());
+
+        if (powerStats.getStrength() != null)
+            this.setStrength(powerStats.getStrength());
+
+        if (powerStats.getAgility() != null)
+            this.setAgility(powerStats.getAgility());
+
+        if (powerStats.getDexterity() != null)
+            this.setDexterity(powerStats.getDexterity());
+
+        if (powerStats.getIntelligence() != null)
+            this.setIntelligence(powerStats.getIntelligence());
+
+        if (powerStats.getCreatedAt() != null)
+            this.setCreatedAt(powerStats.getCreatedAt());
+
+        if (powerStats.getUpdatedAt() != null)
+            this.setUpdatedAt(powerStats.getUpdatedAt());
+
     }
 }

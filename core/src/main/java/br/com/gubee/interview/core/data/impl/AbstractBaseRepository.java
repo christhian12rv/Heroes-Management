@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.List;
@@ -24,10 +25,16 @@ public class AbstractBaseRepository<T> implements BaseRepository<T> {
         this.type = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), AbstractBaseRepository.class);
     }
 
-    public T findByPk(UUID pk) {
-        T entity = entityManager.find(type, pk);
+    public T findById(UUID id) {
+        Query query = entityManager.createQuery("SELECT e FROM " + type.getName() + " e WHERE e.id = :id");
+        query.setParameter("id", id);
 
-        return entity;
+        try {
+            T entity = (T) query.getSingleResult();
+            return entity;
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     public List<T> findAll() {
@@ -38,9 +45,7 @@ public class AbstractBaseRepository<T> implements BaseRepository<T> {
     }
 
     public void update(Object entity) {
-        entityManager.getTransaction().begin();
         entityManager.merge(entity);
-        entityManager.getTransaction().commit();
     }
 
     @Transactional
@@ -48,12 +53,10 @@ public class AbstractBaseRepository<T> implements BaseRepository<T> {
         entityManager.persist(entity);
     }
 
-    public void delete(Integer pk) {
-        T entity = entityManager.find(type, pk);
+    public void delete(UUID id) {
+        T entity = entityManager.find(type, id);
 
-        entityManager.getTransaction().begin();
         entityManager.remove(entity);
-        entityManager.getTransaction().commit();
     }
 
     public Session getSession() {

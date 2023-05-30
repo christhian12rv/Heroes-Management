@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface BaseRepository<T> extends Serializable {
 
-    T findByPk(UUID pk);
+    T findById(UUID id);
 
     List<T> findAll();
 
@@ -14,5 +14,5 @@ public interface BaseRepository<T> extends Serializable {
 
     void update(T entity);
 
-    void delete(Integer pk);
+    void delete(UUID id);
 }

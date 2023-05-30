@@ -1,6 +1,7 @@
 package br.com.gubee.interview.model;
 
 import br.com.gubee.interview.enums.Race;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -10,8 +11,8 @@ import java.util.UUID;
 @Table(name = "hero")
 public class Hero {
     @Id
-    @Column(name = "id", unique = true, nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", unique = true, nullable = false, updatable = false, columnDefinition = "id PRIMARY KEY NOT NULL DEFAULT public.uuid_generate_v4()")
+    @GeneratedValue(generator = "UUID")
     private UUID id;
 
     @Column(name = "name", unique = true, nullable = false)
@@ -21,11 +22,12 @@ public class Hero {
     @Enumerated(EnumType.STRING)
     private Race race;
 
+    @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "power_stats_id", referencedColumnName = "id")
+    @JoinColumn(name = "power_stats_id", nullable = false)
     private PowerStats powerStats;
 
-    @Column(name = "enabled", columnDefinition = "BOOLEAN NOT NULL DEFAULT TRUE")
+    @Column(name = "enabled", columnDefinition = "BOOLEAN NOT NULL DEFAULT TRUE", nullable = false)
     private Boolean enabled;
 
     @Column(name = "created_at", nullable = false)
@@ -100,5 +102,25 @@ public class Hero {
 
     public void setPowerStats(PowerStats powerStats) {
         this.powerStats = powerStats;
+    }
+
+    public void copyNonNullAttributes(Hero hero) {
+        if (hero.getId() != null)
+            this.setId(hero.getId());
+
+        if (hero.getName() != null)
+            this.setName(hero.getName());
+
+        if (hero.getRace() != null)
+            this.setRace(hero.getRace());
+
+        if (hero.getEnabled() != null)
+            this.setEnabled(hero.getEnabled());
+
+        if (hero.getCreatedAt() != null)
+            this.setCreatedAt(hero.getCreatedAt());
+
+        if (hero.getUpdatedAt() != null)
+            this.setUpdatedAt(hero.getUpdatedAt());
     }
 }

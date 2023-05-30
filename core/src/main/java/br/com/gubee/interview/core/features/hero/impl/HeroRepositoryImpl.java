@@ -6,7 +6,7 @@ import br.com.gubee.interview.model.Hero;
 import org.hibernate.SQLQuery;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 @Repository
 public class HeroRepositoryImpl extends AbstractBaseRepository<Hero> implements HeroRepository {
@@ -23,8 +23,11 @@ public class HeroRepositoryImpl extends AbstractBaseRepository<Hero> implements 
         query.setString("name", name);
         query.addEntity(Hero.class);
 
-        Hero hero = (Hero) query.uniqueResult();
-
-        return hero;
+        try {
+            Hero hero = (Hero) query.uniqueResult();
+            return hero;
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 }
